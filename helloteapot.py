@@ -11,7 +11,6 @@ class HelloTeapot ( Context ):
 	def __init__ ( self ):
 
 		vertex_shader = '''
-				// Application to vertex shader
 				varying vec3 P;
 				varying vec3 N;
 				varying vec3 I;
@@ -22,19 +21,20 @@ class HelloTeapot ( Context ):
 					gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	 
 					// position in clip space
-					P = vec3(gl_ModelViewMatrix * gl_Vertex);
+					P = vec3( gl_ModelViewMatrix * gl_Vertex );
 	 
 					// normal transform (transposed model-view inverse)
 					N = gl_NormalMatrix * gl_Normal;
 	 
-					// Incident vector
+					// incident vector
 					I = P;
 	 
-					// Forward current color and texture coordinates after applying texture matrix
+					// forward current color and texture coordinates after applying texture matrix
 					gl_FrontColor = gl_Color;
 					gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
 				}
 				'''
+		
 		fragment_shader = '''
 				varying vec3 P;
 				varying vec3 N;
@@ -44,9 +44,9 @@ class HelloTeapot ( Context ):
 	 
 				void main()
 				{
-					float opacity = dot(normalize(N), normalize(-I));
-					opacity = abs(opacity);
-					opacity = 1.0 - pow(opacity, edgefalloff);
+					float opacity = dot( normalize(N), normalize(-I) );
+					opacity = abs( opacity );
+					opacity = 1.0 - pow( opacity, edgefalloff );
 	 
 					gl_FragColor = opacity * gl_Color;
 				}
@@ -58,16 +58,17 @@ class HelloTeapot ( Context ):
 		self.rotY = 0.0						# set defaults
 		self.falloffValue = 1.0
 
-	def render ( self ):
+
+	def display ( self ):
 
 		self.mod_falloff(0.0)				# trigger a fall-off modify to update shader
-											# clear screen and depth buffer
+											# clear color and depth buffer to start w/ blank screen
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-		glLoadIdentity()					# reset view
+		glLoadIdentity()					# initialize modelview to identity
 
 	 	# draw something
-		glTranslatef( -1.0, -0.5, -5.0 )		# define position wrt view
-		glRotatef( self.rotY, 1.0, 0.0, 0.0 )	# make it spin
+		glTranslatef( -1.0, -0.5, -5.0 )	# translate modelview along x,y,z axes
+		glRotatef( self.rotY, 1.0, 0.0, 0.0 )	# rotate modelview (?)
 	 
 		glEnable( GL_BLEND )				# enable blending
 		glDepthMask( GL_FALSE )				# disable depth masking 
@@ -76,21 +77,14 @@ class HelloTeapot ( Context ):
 	 	glutWireTeapot( 1.0 )				# load a teapot
 	 
 		glScalef( 0.423, 0.423, 0.423 )		# scale it
-		# glutSolidDodecahedron()			# add a dodecahedron
-		# glutSolidIcosahedron()
+		# # glutSolidDodecahedron()			# add a dodecahedron
+		# # glutSolidIcosahedron()
 		glutSolidSphere( 4.2, 5, 3 )
 
 		glutSwapBuffers()					# 
 	 
 		self.rotY += .5
 
-	def mod_falloff ( self, val ):
-		self.falloffValue
-		if self.shader:
-			edgefalloff = glGetUniformLocation( self.shader, "edgefalloff" )
-			if not edgefalloff in ( None, -1 ):
-				self.falloffValue = self.falloffValue + val
-				glUniform1f( edgefalloff, self.falloffValue )
 
 	def keyboard ( self, *args ):
 		# pass in ( key, x, y ) tuples
@@ -102,6 +96,16 @@ class HelloTeapot ( Context ):
 		elif args[0] == 'x':
 			print "increasing falloff"
 			self.mod_falloff( -1.0 )
+
+
+	def mod_falloff ( self, val ):
+		self.falloffValue
+		if self.shader:
+			edgefalloff = glGetUniformLocation( self.shader, "edgefalloff" )
+			if not edgefalloff in ( None, -1 ):
+				self.falloffValue = self.falloffValue + val
+				glUniform1f( edgefalloff, self.falloffValue )
+
 
 if __name__ == '__main__':
 	print "Hit ESC key to quit."

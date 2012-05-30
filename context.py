@@ -19,68 +19,67 @@ class Context( object ):
 	'''Context with GLUT window'''
 
 	def __init__ ( self, title="title", width=640, height=480, pos_x=50, pos_y=50, 
-					vertex_shader='''''', fragment_shader='''''' ):
+					vertex_shader=None, fragment_shader=None ):
 	 
-		self.width = width
-		self.height = height
-
+		# initialize GLUT library ( cf. window handling, user interactions )
 		glutInit( sys.argv )
-		self.window = self.init_window( title, pos_x, pos_y )
-		self.register_callbacks()
-
-		glClearColor( 0.0, 0.0, 0.0, 0.0 )	# clear background color
-		glClearDepth( 1.0 )					# enable depth buffer clearing
-		glShadeModel( GL_SMOOTH )			# enable smooth color shading
-
-		glMatrixMode( GL_PROJECTION )
-		glLoadIdentity()                   	# reset projection matrix
-											# calculate window's aspect ratio
-		gluPerspective( 45.0, float(width) / float(height), 0.1, 100.0 )
-		glMatrixMode( GL_MODELVIEW )
-
-		self.shader = shaders.compileProgram ( # uses OpenGL.GL.shaders
-						shaders.compileShader( vertex_shader, GL_VERTEX_SHADER ),
-						shaders.compileShader( fragment_shader, GL_FRAGMENT_SHADER ) )
-		glUseProgram( self.shader )
-	
-	def init_window ( self, title, pos_x=0, pos_y=0 ):
-		'''Create a window object'''
-		
-		glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH ) # select display mode
-		glutInitWindowPosition( pos_x, pos_y )			# set upper left corner on screen
-		glutInitWindowSize( self.width, self.height )
-		return glutCreateWindow( title )
-
-	def register_callbacks( self ):
-		'''Register a bunch of callback functions for various events'''
-		
-		glutDisplayFunc( self.render )		# display callback function
+		glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH )
 		# glutFullScreen()
-		glutIdleFunc( self.render )
-		glutReshapeFunc( self.resize )		# window resize event
+
+		# create window
+		glutInitWindowPosition( pos_x, pos_y ) 	# set upper left corner on screen
+		glutInitWindowSize( width, height )
+		self.window = glutCreateWindow( title )
+
+		# register callback functions
+		glutDisplayFunc( self.display )
+		glutIdleFunc( self.display )
+		glutReshapeFunc( self.reshape )		# called on window creation as well ?
 		glutKeyboardFunc( self.keyboard )
 		glutMouseFunc( self.mouse )
 
-	def resize ( self, width, height ):
-		glViewport( 0, 0, width, height )	# reset current viewport and perspective transformation
-		glMatrixMode( GL_PROJECTION )
-		glLoadIdentity()
+		# 
+		glClearColor( 0.0, 0.0, 0.0, 0.0 )	# select clearing (background) color
+		glClearDepth( 1.0 )					# enable depth buffer clearing
+		glShadeModel( GL_SMOOTH )			# enable smooth color shading
+
+		# compile shaders
+		if vertex_shader or fragment_shader:
+			self.shader = shaders.compileProgram ( # uses OpenGL.GL.shaders
+							shaders.compileShader( vertex_shader, GL_VERTEX_SHADER ),
+							shaders.compileShader( fragment_shader, GL_FRAGMENT_SHADER ) )
+			glUseProgram( self.shader )
+		
+		# print( glGetString( GL_VERSION ))
+	
+	
+	def reshape ( self, width, height ):
+		'''For subclass to implement callback for window resize events. Fallback provided.'''
+		
+		glViewport( 0, 0, width, height )	# define viewport, here: ALL the window
+		glMatrixMode( GL_PROJECTION )		# specify matrix stack for subsequent operations
+		glLoadIdentity()					# replace current matrix with identity matrix
+		# specify viewer's perspective into coordinate system
 		gluPerspective( 45.0, float(width) / float(height), 0.1, 100.0 )
 		glMatrixMode( GL_MODELVIEW )
 
-	def render ( self ):
+
+	def display ( self ):
 		'''For subclass to implement their rendering behavior.'''
 		raise NotImplementedError
-		
+	
+
 	def keyboard ( self, *args ):
 		# pass in ( key, x, y ) tuples
 		'''For subclass to implement their keyboard behavior.'''
 		raise NotImplementedError
 
+
 	def mouse ( *args ):
 		'''For subclass to implement their mouse behavior.'''
 		raise NotImplementedError
 
+
 	@staticmethod
 	def run ():
-		glutMainLoop()		# start the event processing engine
+		glutMainLoop()		# start event processing engine
