@@ -1,8 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# adapted from http://www.seethroughskin.com/blog/?p=771
+# originally adapted from http://www.seethroughskin.com/blog/?p=771
 # which modified http://www.pygame.org/wiki/GLSLExample
+
+# cf. http://www.songho.ca/opengl/gl_transform.html 
+# for a good explanation on transformations
 
 from context import *
 
@@ -57,8 +60,6 @@ class HelloTeapot ( Context ):
 
 		self.rotY = 0.0						# set defaults
 		self.falloffValue = 1.0
-		self.width = 680
-		self.height = 480
 
 
 	def display ( self ):
@@ -72,8 +73,6 @@ class HelloTeapot ( Context ):
 	 
 		glEnable( GL_BLEND )				# enable blending
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) # x-ray shader applies opacity falloff
-
-		# cf. http://www.songho.ca/opengl/gl_transform.html for a good explanation on transformations
 
 		# GL_MODELVIEW : transformation matrix from object to eye coordinates
 		# combining MODEL ( object to world space ) and VIEW ( world to eye space ) 

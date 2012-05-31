@@ -45,7 +45,7 @@ class Context( object ):
 		glShadeModel( GL_SMOOTH )			# GL_FLAT or GL_SMOOTH
 
 		# compile shaders
-		if vertex_shader or fragment_shader:
+		if vertex_shader and fragment_shader:
 			self.shader = shaders.compileProgram ( # uses OpenGL.GL.shaders
 							shaders.compileShader( vertex_shader, GL_VERTEX_SHADER ),
 							shaders.compileShader( fragment_shader, GL_FRAGMENT_SHADER ) )
