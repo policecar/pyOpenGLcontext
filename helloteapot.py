@@ -51,39 +51,63 @@ class HelloTeapot ( Context ):
 					gl_FragColor = opacity * gl_Color;
 				}
 				'''
-		
+
 		super ( HelloTeapot, self ).__init__ ( "Nu?", 680, 480, 50, 50, 
 			vertex_shader, fragment_shader )
 
 		self.rotY = 0.0						# set defaults
 		self.falloffValue = 1.0
+		self.width = 680
+		self.height = 480
 
 
 	def display ( self ):
-
-		self.mod_falloff(0.0)				# trigger a fall-off modify to update shader
-											# clear color and depth buffer to start w/ blank screen
+		'''Custom display /render function. Structural sample provided.'''
+		
+		# clear color and depth buffer
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT )
-		glLoadIdentity()					# initialize modelview to identity
 
-	 	# draw something
-		glTranslatef( -1.0, -0.5, -5.0 )	# translate modelview along x,y,z axes
-		glRotatef( self.rotY, 1.0, 0.0, 0.0 )	# rotate modelview (?)
+		# stuff
+		self.mod_falloff(0.0)				# trigger a fall-off modify to update shader
 	 
 		glEnable( GL_BLEND )				# enable blending
-		glDepthMask( GL_FALSE )				# disable depth masking 
 		glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA ) # x-ray shader applies opacity falloff
-	 
+
+		# GL_MODELVIEW : transformation matrix from object to eye coordinates
+		# combining MODEL ( object to world space ) and VIEW ( world to eye space ) 
+		glMatrixMode( GL_MODELVIEW )		# specify matrix stack for subsequent operations
+		glLoadIdentity()					# replace current matrix with identity matrix
+		
+		glScalef( 1.0, 1.0, 1.0 )			# listed for completion
+		glTranslatef( -1.0, -0.5, -5.0  )
+		glRotatef( self.rotY, 1.0, 0.0, 0.0 )
 	 	glutWireTeapot( 1.0 )				# load a teapot
 	 
 		glScalef( 0.423, 0.423, 0.423 )		# scale it
-		# # glutSolidDodecahedron()			# add a dodecahedron
-		# # glutSolidIcosahedron()
 		glutSolidSphere( 4.2, 5, 3 )
 
-		glutSwapBuffers()					# 
+		# glFlush()
+		glutSwapBuffers()					#
 	 
 		self.rotY += .5
+
+
+	def reshape ( self, width, height ):
+		'''Scale projection with window size.'''
+		
+		# GL_PROJECTION : transformation matrix from eye to clip coordinates
+		# combining viewing frustum ( 3D to 2D ) and normalized device coordinates
+		glMatrixMode( GL_PROJECTION )
+		glLoadIdentity()
+
+		# # define coordinate system
+		# glOrtho( 0.0, width, 0.0, height, -1.0, 1.0 )
+		
+		# specify viewer's perspective into coordinate system
+		gluPerspective( 45.0, float(width) / float(height), 0.1, 100.0 )
+
+		# transformation from normalized device coordinates to window coordinates
+		glViewport( 0, 0, width, height )	# define viewport, here: ALL the window
 
 
 	def keyboard ( self, *args ):

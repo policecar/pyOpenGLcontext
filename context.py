@@ -26,7 +26,7 @@ class Context( object ):
 		glutInitDisplayMode( GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH )
 		# glutFullScreen()
 
-		# create window
+		# initialize and create window
 		glutInitWindowPosition( pos_x, pos_y ) 	# set upper left corner on screen
 		glutInitWindowSize( width, height )
 		self.window = glutCreateWindow( title )
@@ -34,14 +34,15 @@ class Context( object ):
 		# register callback functions
 		glutDisplayFunc( self.display )
 		glutIdleFunc( self.display )
-		glutReshapeFunc( self.reshape )		# called on window creation as well ?
+		glutReshapeFunc( self.reshape )		# called on window creation as well
 		glutKeyboardFunc( self.keyboard )
 		glutMouseFunc( self.mouse )
 
-		# 
-		glClearColor( 0.0, 0.0, 0.0, 0.0 )	# select clearing (background) color
-		glClearDepth( 1.0 )					# enable depth buffer clearing
-		glShadeModel( GL_SMOOTH )			# enable smooth color shading
+		# specify clear values for some buffers and the shading technique to use
+		# ( noted for explicity only, values are the defaults )
+		glClearColor( 0.0, 0.0, 0.0, 0.0 )	# range [0;1]
+		glClearDepth( 1.0 )					# range [0;1]
+		glShadeModel( GL_SMOOTH )			# GL_FLAT or GL_SMOOTH
 
 		# compile shaders
 		if vertex_shader or fragment_shader:
@@ -54,15 +55,8 @@ class Context( object ):
 	
 	
 	def reshape ( self, width, height ):
-		'''For subclass to implement callback for window resize events. Fallback provided.'''
-		
-		glViewport( 0, 0, width, height )	# define viewport, here: ALL the window
-		glMatrixMode( GL_PROJECTION )		# specify matrix stack for subsequent operations
-		glLoadIdentity()					# replace current matrix with identity matrix
-		# specify viewer's perspective into coordinate system
-		gluPerspective( 45.0, float(width) / float(height), 0.1, 100.0 )
-		glMatrixMode( GL_MODELVIEW )
-
+		'''For subclass to implement callback for window resize events.'''
+		raise NotImplementedError
 
 	def display ( self ):
 		'''For subclass to implement their rendering behavior.'''
