@@ -58,6 +58,8 @@ class HelloTeapot ( Context ):
 		super ( HelloTeapot, self ).__init__ ( "Nu?", 680, 480, 50, 50, 
 			vertex_shader, fragment_shader )
 
+		glutIdleFunc( self.display )		# set callback for being idle
+
 		self.rotY = 0.0						# set defaults
 		self.falloffValue = 1.0
 

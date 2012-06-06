@@ -33,7 +33,7 @@ class Context( object ):
 
 		# register callback functions
 		glutDisplayFunc( self.display )
-		glutIdleFunc( self.display )
+		# glutIdleFunc( self.display )
 		glutReshapeFunc( self.reshape )		# called on window creation as well
 		glutKeyboardFunc( self.keyboard )
 		glutMouseFunc( self.mouse )
@@ -56,7 +56,7 @@ class Context( object ):
 	
 	def reshape ( self, width, height ):
 		'''For subclass to implement callback for window resize events.'''
-		raise NotImplementedError
+		# raise NotImplementedError
 
 	def display ( self ):
 		'''For subclass to implement their rendering behavior.'''
@@ -66,12 +66,12 @@ class Context( object ):
 	def keyboard ( self, *args ):
 		# pass in ( key, x, y ) tuples
 		'''For subclass to implement their keyboard behavior.'''
-		raise NotImplementedError
+		# raise NotImplementedError
 
 
 	def mouse ( *args ):
 		'''For subclass to implement their mouse behavior.'''
-		raise NotImplementedError
+		# raise NotImplementedError
 
 
 	@staticmethod
